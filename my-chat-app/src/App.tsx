@@ -72,13 +72,13 @@ const App: React.FC<AppProps> = ({ user }) => {
       }
     };
     socket.onclose = (event) => {
-      console.log(`WebSocket closed: code=${event.code}, reason=${event.reason}`);
       setWs(null);
       const delay = baseReconnectDelay * Math.pow(2, reconnectAttempts);
-      setTimeout(() => {
-        setReconnectAttempts((prev) => prev + 1);
-        connectWebSocket();
-      }, delay);
+      console.log(`WebSocket closed: code=${event.code}, reason=${event.reason}, attempting reconnection with ${delay}`);
+      // setTimeout(() => {
+      //   setReconnectAttempts((prev) => prev + 1);
+      //   connectWebSocket();
+      // }, delay);
     };
     socket.onerror = (err) => {
       console.error('WebSocket error:', err);
@@ -116,6 +116,7 @@ const App: React.FC<AppProps> = ({ user }) => {
 
     // Initialize WebSocket
     if (!ws) {
+      setReconnectAttempts(prev => prev + 1);
       connectWebSocket();
     }
 
@@ -249,9 +250,8 @@ const App: React.FC<AppProps> = ({ user }) => {
           <div
             key={u.id}
             onClick={() => selectUser(u)}
-            className={`p-2 rounded cursor-pointer hover:bg-gray-200 ${
-              selectedUser?.id === u.id ? 'bg-gray-300' : ''
-            }`}
+            className={`p-2 rounded cursor-pointer hover:bg-gray-200 ${selectedUser?.id === u.id ? 'bg-gray-300' : ''
+              }`}
           >
             {u.username}
           </div>
@@ -271,9 +271,8 @@ const App: React.FC<AppProps> = ({ user }) => {
                 className={`flex mb-2 ${msg.sender_id === user.id ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-xs p-3 rounded-2xl ${
-                    msg.sender_id === user.id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'
-                  }`}
+                  className={`max-w-xs p-3 rounded-2xl ${msg.sender_id === user.id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'
+                    }`}
                 >
                   <p>{msg.content}</p>
                   <div className="text-xs text-gray-500 mt-1">
